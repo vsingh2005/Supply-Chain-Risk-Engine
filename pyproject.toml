@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "supply-chain-risk-engine"
+version = "0.1.0"
+description = "Quantitative supply chain risk modeling, Monte Carlo simulation, and inventory optimization engine."
+authors = [{ name = "Author" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "pandas>=2.0.0",
+    "pulp>=2.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
