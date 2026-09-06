@@ -1,5 +1,10 @@
 # Supply Chain Risk & Inventory Optimization Engine
 
+[![CI](https://github.com/vsingh2005/supply-chain-risk-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/vsingh2005/supply-chain-risk-engine/actions/workflows/ci.yml)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)
+![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
+
 A quantitative operations analytics and stochastic simulation suite designed for multi-echelon supply chain networks under demand volatility, supplier disruption risks, and capacity constraints.
 
 ## Overview & Methodology
