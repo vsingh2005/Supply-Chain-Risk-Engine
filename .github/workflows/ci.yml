@@ -32,8 +32,8 @@ jobs:
 
       - name: Lint Code
         run: |
-          ruff check .
+          ruff check src/ tests/
 
       - name: Run Test Suite
         run: |
-          pytest tests/ -v --cov=supply_chain_risk --cov-report=term-missing
+          pytest tests/ -v

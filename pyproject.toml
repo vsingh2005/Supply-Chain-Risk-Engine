@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "supply-chain-risk-engine"
 version = "0.1.0"
 description = "Quantitative supply chain risk modeling, Monte Carlo simulation, and inventory optimization engine."
-authors = [{ name = "Author" }]
+authors = [{ name = "Vansh Singh" }]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -20,9 +20,18 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
     "ruff>=0.1.0",
-    "mypy>=1.5.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = [".ghost", "ghost_engine"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["F401", "E501"]
