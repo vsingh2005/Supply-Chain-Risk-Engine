@@ -5,7 +5,7 @@
 ![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
 
-A quantitative operations analytics and stochastic simulation suite designed for multi-echelon supply chain networks under demand volatility, supplier disruption risks, and capacity constraints.
+Quantitative operations analytics and stochastic simulation suite for multi-echelon supply chain networks.
 
 ## Overview & Methodology
 
@@ -16,22 +16,12 @@ A quantitative operations analytics and stochastic simulation suite designed for
 ```
 
 ## Features
-- **Stochastic Demand Forecasting**: Geometric Brownian Motion, Poisson arrival processes, and seasonal Holt-Winters simulation.
+
+- **Stochastic Demand Forecasting**: Geometric Brownian Motion, Poisson arrival processes, and seasonal simulation.
 - **Vulnerability & Disruption Scoring**: Value at Risk (VaR), Conditional Value at Risk (CVaR), and network bottleneck centrality.
 - **Multi-Echelon Inventory Optimization**: Mixed-Integer Linear Programming (MILP) solving safety stock levels, holding costs, and stockout penalties.
-- **Scenario Sensitivity Analysis**: Stress testing lead times and geopolitical supplier disruption scenarios.
+- **Scenario Sensitivity Analysis**: Stress testing lead times and supplier disruption scenarios.
 
 ## Tech Stack
-- **Language**: Python 3.11+
-- **Optimization & Math**: SciPy, NumPy, PuLP, Pandas
-- **Testing & Quality**: Pytest, Ruff
 
-## Quickstart
-
-```bash
-# Install package
-pip install -e .
-
-# Run test suite
-pytest tests/ -v
-```
+Python 3.11+, PuLP, SciPy, NumPy, Pandas, Pytest
