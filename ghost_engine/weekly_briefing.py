@@ -70,6 +70,22 @@ STUDY_GUIDE_KNOWLEDGE_BASE = {
                 "interview_talking_point": "If asked about low-level performance: 'Standard matrix multiplication suffers from cache misses on large matrices. I implemented loop tiling to keep active sub-matrices resident in L1 cache, significantly improving memory throughput.'"
             }
         ]
+    },
+    "RPN_Calculator": {
+        "title": "RPN Calculator & Expression Translator",
+        "tech_stack": "Python, Custom Stack/Queue Data Structures, Shunting-Yard Algorithm",
+        "concepts": [
+            {
+                "topic": "Infix to Postfix (Shunting-Yard Algorithm)",
+                "explanation": "Translates human-readable infix arithmetic expressions into Reverse Polish Notation using operator precedence stacks and associative queues.",
+                "interview_talking_point": "If asked about fundamental data structures: 'I built an expression parser implementing Dijkstra's Shunting-yard algorithm using custom Stack and Queue data structures to handle arbitrary operator precedence and parentheses.'"
+            },
+            {
+                "topic": "Stack-Based Postfix Evaluation",
+                "explanation": "Evaluates postfix tokens in single-pass linear time O(N) by pushing operands and popping operands when operators are encountered.",
+                "interview_talking_point": "If asked about algorithm efficiency: 'Stack-based RPN evaluation eliminates recursive backtracking, allowing linear O(N) arithmetic computation with O(N) space complexity.'"
+            }
+        ]
     }
 }
 
