@@ -11,7 +11,13 @@ from typing import Optional
 
 from ghost_engine.config import GhostConfig
 from ghost_engine.humanizer import clean_commit_message
-from ghost_engine.scheduler import should_execute_now, apply_jitter
+from ghost_engine.scheduler import (
+    should_execute_now,
+    apply_jitter,
+    determine_session_burst_size,
+    calculate_intra_session_delay_seconds
+)
+import time
 from ghost_engine.task_manager import TaskManager
 from ghost_engine.generator import CodeGenerator
 from ghost_engine.validator import run_repo_tests
@@ -77,14 +83,16 @@ def process_repository(
     repo_path: Path,
     config: GhostConfig,
     dry_run: bool = False,
-    push: bool = True
-) -> bool:
+    push: bool = True,
+    max_burst: Optional[int] = None
+) -> int:
     """
-    Advances a single repository by one or more roadmap tasks.
+    Advances a single repository by 1 to 3 roadmap tasks in a realistic burst session.
+    Returns the number of successful commits.
     """
     if not repo_path.exists():
         print(f"[Ghost Runner] Repo path does not exist: {repo_path}")
-        return False
+        return 0
         
     print(f"\n=======================================================")
     print(f"[Ghost Runner] Processing repository: {repo_path.name}")
@@ -93,48 +101,60 @@ def process_repository(
     task_mgr = TaskManager(str(repo_path))
     generator = CodeGenerator(str(repo_path))
     
-    task = task_mgr.get_next_task()
-    if not task:
-        print(f"[Ghost Runner] No pending roadmap tasks remaining for {repo_path.name}.")
-        return False
+    burst_count = max_burst if max_burst is not None else determine_session_burst_size()
+    print(f"[Ghost Runner] Active session plan: {burst_count} commit(s)")
+    
+    successful_commits = 0
+    for i in range(burst_count):
+        task = task_mgr.get_next_task()
+        if not task:
+            print(f"[Ghost Runner] No further pending roadmap tasks for {repo_path.name}.")
+            break
+            
+        print(f"\n[Ghost Runner] [{i+1}/{burst_count}] Task: [{task.get('id')}] - {task.get('title')}")
         
-    print(f"[Ghost Runner] Next task: [{task.get('id')}] - {task.get('title')}")
-    
-    # Apply the code changes
-    success, msg, raw_commit_msg = generator.apply_task(task)
-    if not success:
-        print(f"[Ghost Runner] Task application failed: {msg}")
-        return False
+        # Apply the code changes
+        success, msg, raw_commit_msg = generator.apply_task(task)
+        if not success:
+            print(f"[Ghost Runner] Task application failed: {msg}")
+            break
+            
+        print(f"[Ghost Runner] {msg}")
         
-    print(f"[Ghost Runner] {msg}")
-    
-    # Run test suite validation
-    tests_pass, test_msg = run_repo_tests(repo_path)
-    if not tests_pass:
-        print(f"[Ghost Runner] Pre-commit test failure: {test_msg}")
-        # Rollback changes if tests fail
-        run_git_command(["checkout", "."], repo_path)
-        return False
+        # Run test suite validation
+        tests_pass, test_msg = run_repo_tests(repo_path)
+        if not tests_pass:
+            print(f"[Ghost Runner] Pre-commit test failure: {test_msg}")
+            run_git_command(["checkout", "."], repo_path)
+            break
+            
+        print(f"[Ghost Runner] Validation passed: {test_msg}")
         
-    print(f"[Ghost Runner] Validation passed: {test_msg}")
-    
-    # Sanitize commit message
-    final_commit_msg = clean_commit_message(raw_commit_msg)
-    
-    # Commit and push
-    committed = commit_and_push(
-        repo_path=repo_path,
-        commit_msg=final_commit_msg,
-        author_name=config.git_author_name,
-        author_email=config.git_author_email,
-        dry_run=dry_run,
-        push=push
-    )
-    
-    if committed and not dry_run:
-        task_mgr.mark_task_complete(task.get("id", "task"))
+        # Sanitize commit message
+        final_commit_msg = clean_commit_message(raw_commit_msg)
         
-    return committed
+        # Commit and push
+        committed = commit_and_push(
+            repo_path=repo_path,
+            commit_msg=final_commit_msg,
+            author_name=config.git_author_name,
+            author_email=config.git_author_email,
+            dry_run=dry_run,
+            push=push
+        )
+        
+        if committed:
+            successful_commits += 1
+            if not dry_run:
+                task_mgr.mark_task_complete(task.get("id", "task"))
+                
+            # If multi-commit burst, pause briefly before next commit (unless dry-run)
+            if i < burst_count - 1 and not dry_run:
+                pause = calculate_intra_session_delay_seconds()
+                print(f"[Ghost Runner] Pausing {pause}s before next commit in session...")
+                time.sleep(pause)
+                
+    return successful_commits
 
 def main():
     parser = argparse.ArgumentParser(description="Autonomous Ghost Developer Engine")
